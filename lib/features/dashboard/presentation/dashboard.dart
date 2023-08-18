@@ -1,5 +1,8 @@
+import 'package:daily_mind/features/app_logo/presentation/app_logo.dart';
+import 'package:daily_mind/features/background/presentation/background.dart';
+import 'package:daily_mind/features/favorite_sounds/presentation/favorite_sounds.dart';
+import 'package:daily_mind/theme/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:get/utils.dart';
 
 class Dashboard extends StatelessWidget {
   const Dashboard({
@@ -9,15 +12,27 @@ class Dashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: false,
-        title: Text(
-          'Daily Mind',
-          style: context.textTheme.headlineMedium
-              ?.copyWith(fontWeight: FontWeight.w700),
-        ),
+      body: Stack(
+        children: [
+          const Background(),
+          SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const AppLogo(),
+                Flexible(
+                  child: SingleChildScrollView(
+                    child: Container(
+                      padding: EdgeInsets.only(top: spacing(5)),
+                      child: const FavoriteSounds(),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-      body: Container(),
     );
   }
 }
