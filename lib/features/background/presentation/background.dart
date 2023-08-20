@@ -2,21 +2,28 @@ import 'package:blur/blur.dart';
 import 'package:daily_mind/theme/theme.dart';
 import 'package:flutter/material.dart';
 
+final backgroundImages = [
+  'assets/images/forest.png',
+  'assets/images/red_forest.png'
+];
+
 class Background extends StatelessWidget {
-  const Background({super.key});
+  final int backgroundIndex;
+
+  const Background({
+    super.key,
+    this.backgroundIndex = 0,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('assets/images/forrest.jpg'),
+          image: AssetImage(backgroundImages[backgroundIndex]),
           fit: BoxFit.cover,
         ),
       ),
-    ).blurred(
-      blurColor: background,
-      blur: 10,
-    );
+    ).blurred(blurColor: background);
   }
 }

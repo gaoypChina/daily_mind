@@ -1,9 +1,14 @@
-import 'package:daily_mind/features/dashboard/presentation/dashboard.dart';
+import 'package:daily_mind/router/router.dart';
 import 'package:daily_mind/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -13,11 +18,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       title: 'DailyMind',
       theme: darkTheme,
       themeMode: ThemeMode.dark,
-      home: const Dashboard(),
+      routerConfig: routerConfig,
     );
   }
 }
