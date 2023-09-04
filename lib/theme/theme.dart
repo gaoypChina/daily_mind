@@ -1,9 +1,8 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/material.dart';
-
-const background = Color(0xFF272727);
+import 'package:google_fonts/google_fonts.dart';
 
 final darkTheme = FlexThemeData.dark(
+  fontFamily: GoogleFonts.inter().fontFamily,
   scheme: FlexScheme.sakura,
   useMaterial3: true,
 );
