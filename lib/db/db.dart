@@ -19,11 +19,17 @@ class Db {
   }
 
   Stream<List<Playlist>> getAllPlaylists() {
-    return isar.playlists.where().findAll().asStream();
+    return isar.playlists.where().watch(fireImmediately: true);
   }
 
   Playlist? getPlaylistById(int id) {
     return isar.playlists.where().idEqualTo(id).findFirstSync();
+  }
+
+  void deletePlaylist(int id) {
+    isar.writeTxnSync(() {
+      isar.playlists.deleteSync(id);
+    });
   }
 
   void onUpdatePlaylistTitle(int playlistId, String title) {

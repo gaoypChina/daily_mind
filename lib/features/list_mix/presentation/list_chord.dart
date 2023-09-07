@@ -11,7 +11,8 @@ class ListChord extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final playlistSnapshot = useStream(db.getAllPlaylists());
+    final streamPlaylist = useMemoized(db.getAllPlaylists, []);
+    final playlistSnapshot = useStream(streamPlaylist);
     final playlists = playlistSnapshot.data ?? [];
 
     return ListView.separated(
@@ -19,7 +20,10 @@ class ListChord extends HookWidget {
       itemBuilder: (context, index) {
         final playlist = playlists[index];
 
-        return ListChordItem(playlist: playlist);
+        return ListChordItem(
+          key: ValueKey(playlist.id),
+          playlist: playlist,
+        );
       },
       separatorBuilder: (context, index) {
         return SizedBox(height: spacing());
