@@ -1,5 +1,6 @@
 import 'package:daily_mind/common_applications/safe_builder.dart';
 import 'package:daily_mind/db/schemas/playlist.dart';
+import 'package:daily_mind/db/schemas/settings.dart';
 import 'package:daily_mind/features/mix_editor/domain/mix_editor_item_state.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
@@ -13,13 +14,14 @@ class Db {
     isar = await Isar.open(
       [
         PlaylistSchema,
+        SettingsSchema,
       ],
       directory: dir.path,
     );
   }
 
-  Stream<List<Playlist>> getAllPlaylists() {
-    return isar.playlists.where().watch(fireImmediately: true);
+  Stream<List<Playlist>> streamAllPlaylists() {
+    return isar.playlists.where().watch();
   }
 
   Stream<Playlist?> streamPlaylistById(int id) {
@@ -28,6 +30,40 @@ class Db {
 
   Playlist? getPlaylistById(int id) {
     return isar.playlists.getSync(id);
+  }
+
+  List<Playlist> getAllPlaylists() {
+    return isar.playlists.where().findAllSync();
+  }
+
+  Settings? getTheme() {
+    return isar.settings.filter().typeEqualTo("theme").findFirstSync();
+  }
+
+  Stream<List<Settings>> streamTheme() {
+    return isar.settings.filter().typeEqualTo("theme").watch();
+  }
+
+  void addTheme(String value) {
+    final themeSetting =
+        isar.settings.filter().typeEqualTo("theme").findFirstSync();
+
+    isar.writeTxnSync(() {
+      safeValueBuilder(
+        themeSetting,
+        (safeThemeSetting) {
+          safeThemeSetting.value = value;
+          isar.settings.putSync(safeThemeSetting);
+        },
+        () {
+          final newThemeSetting = Settings()
+            ..type = "theme"
+            ..value = value;
+
+          isar.settings.putSync(newThemeSetting);
+        },
+      );
+    });
   }
 
   void deletePlaylist(int id) {
