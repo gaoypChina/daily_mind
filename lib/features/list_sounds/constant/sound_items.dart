@@ -3,32 +3,32 @@ import 'package:daily_mind/features/list_sounds/domain/sound_card.dart';
 final List<SoundItem> soundItems = [
   SoundItem(
     id: 'rain',
-    name: 'Mưa',
+    name: 'rain',
     image: 'assets/images/rain-forest.png',
   ),
   SoundItem(
     id: 'forest',
-    name: 'Rừng',
+    name: 'forest',
     image: 'assets/images/forest-with-birds.png',
   ),
   SoundItem(
     id: 'wind',
-    name: 'Gió',
+    name: 'wind',
     image: 'assets/images/wind-and-peaceful.png',
   ),
   SoundItem(
     id: 'fire',
-    name: 'Lửa',
+    name: 'fire',
     image: 'assets/images/firecamp.png',
   ),
   SoundItem(
     id: 'water',
-    name: 'Nước',
+    name: 'water',
     image: 'assets/images/water.png',
   ),
   SoundItem(
     id: 'space',
-    name: 'Không gian',
+    name: 'space',
     image: 'assets/images/sky.png',
   ),
 ];
