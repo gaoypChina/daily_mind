@@ -1,4 +1,4 @@
-import 'package:daily_mind/features/list_sounds/constant/sound_items.dart';
+import 'package:daily_mind/constants/sound_items.dart';
 import 'package:daily_mind/theme/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +18,8 @@ class SoundIconsStack extends StatelessWidget {
       alignment: AlignmentDirectional.topEnd,
       children: ids.map(
         (id) {
-          final soundItem = soundItems.firstWhere((item) => item.id == id);
+          final soundItem =
+              soundOfflineItems.firstWhere((item) => item.id == id);
           final index = ids.indexOf(id);
 
           return Container(

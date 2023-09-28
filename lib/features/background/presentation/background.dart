@@ -1,6 +1,4 @@
-import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
-import 'package:get/utils.dart';
 
 class Background extends StatelessWidget {
   final String image;
@@ -19,13 +17,10 @@ class Background extends StatelessWidget {
           fit: BoxFit.cover,
           colorFilter: const ColorFilter.mode(
             Colors.black87,
-            BlendMode.overlay,
+            BlendMode.darken,
           ),
         ),
       ),
-    ).blurred(
-      blurColor: Colors.black,
-      colorOpacity: 0.6,
     );
   }
 }

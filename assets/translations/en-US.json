@@ -22,7 +22,7 @@
   "nextStep": "Next step",
   "pickTime": "Pick time",
   "rain": "Rain",
-  "sound": "Sound",
+  "naturalSounds": "Natural sounds",
   "soundEditor": "Sound Editor",
   "soundList": "Sound list",
   "space": "Space",
@@ -34,5 +34,7 @@
   "addNewMixTutorialContent": "Click here to add a new mix",
   "newMixTutorialContent1": "Choose one or more sounds from the list to create a new mix",
   "newMixTutorialContent2": "After choosing your favorite sounds. Click here to continue",
-  "mixEditorContent": "Adjust the volume of each sound to suit you"
+  "mixEditorContent": "Adjust the volume of each sound to suit you",  
+  "cancel": "Cancel",
+  "ok": "Ok"
 }

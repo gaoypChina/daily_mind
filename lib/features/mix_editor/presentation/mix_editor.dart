@@ -4,7 +4,7 @@ import 'package:daily_mind/features/app_bar_filter/presentation/app_bar_filter.d
 import 'package:daily_mind/features/mix_editor/presentation/mix_editor_add_button.dart';
 import 'package:daily_mind/features/mix_editor/presentation/mix_editor_provider.dart';
 import 'package:daily_mind/features/mix_editor_item/presentation/mix_editor_item.dart';
-import 'package:daily_mind/features/new_mix/presentation/new_mix_selected_provider.dart';
+import 'package:daily_mind/features/new_mix/presentation/new_mix_provider.dart';
 import 'package:daily_mind/features/stack_background/presentation/stack_background.dart';
 import 'package:daily_mind/features/tutorial/constant/constant.dart';
 import 'package:daily_mind/features/tutorial/presentation/tutorial.dart';
@@ -26,10 +26,10 @@ class MixEditor extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appState = ref.watch(appProvider);
-    final newMixSelectedState = ref.watch(newMixSelectedProvider);
+    final newMixSelectedState = ref.watch(newMixProvider);
 
     final mixEditorMemoized = useMemoized(
-      () => mixEditorProvider(newMixSelectedState.selectedIds),
+      () => mixEditorProvider(newMixSelectedState.selectedStates),
     );
 
     final mixEditorNotifier = ref.read(mixEditorMemoized.notifier);
@@ -85,23 +85,28 @@ class MixEditor extends HookConsumerWidget {
                       ),
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.only(top: spacing(4)),
-                    child: ListView.separated(
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        return MixEditorItem(
-                          volumeKey:
-                              index == 0 ? mixEditorVolumeKey : ValueKey(index),
-                          onItemVolumeChanged:
-                              mixEditorNotifier.onItemVolumeChanged,
-                          itemState: mixEditorState.itemStates[index],
-                        );
-                      },
-                      separatorBuilder: (context, index) {
-                        return SizedBox(height: spacing(2));
-                      },
-                      itemCount: mixEditorState.itemStates.length,
+                  Flexible(
+                    child: Container(
+                      padding: EdgeInsets.only(top: spacing(4)),
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          childAspectRatio: 3,
+                          mainAxisSpacing: spacing(2),
+                          crossAxisSpacing: spacing(2),
+                        ),
+                        itemBuilder: (context, index) {
+                          return MixEditorItem(
+                            volumeKey: index == 0
+                                ? mixEditorVolumeKey
+                                : ValueKey(index),
+                            onItemVolumeChanged:
+                                mixEditorNotifier.onItemVolumeChanged,
+                            itemState: mixEditorState.itemStates[index],
+                          );
+                        },
+                        itemCount: mixEditorState.itemStates.length,
+                      ),
                     ),
                   ),
                 ],

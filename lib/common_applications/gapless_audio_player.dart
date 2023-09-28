@@ -6,9 +6,12 @@ import 'package:just_audio/just_audio.dart';
 
 class GaplessAudioPlayer {
   final audioPlayer = AudioPlayer();
+
   late List<AudioSource> children;
 
   Stream<bool> get playingStream => audioPlayer.playingStream;
+
+  bool get isPlaying => audioPlayer.playing;
 
   void setSource(String id) async {
     children = [];

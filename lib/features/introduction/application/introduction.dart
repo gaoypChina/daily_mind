@@ -1,5 +1,4 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:blur/blur.dart';
 import 'package:flutter/material.dart';
 import 'package:get/utils.dart';
 import 'package:introduction_screen/introduction_screen.dart';
@@ -30,15 +29,12 @@ PageViewModel createPageViewModel(
         image: DecorationImage(
           image: AssetImage(image),
           fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(
-            context.theme.primaryColor,
-            BlendMode.overlay,
+          colorFilter: const ColorFilter.mode(
+            Colors.black87,
+            BlendMode.darken,
           ),
         ),
       ),
-    ).blurred(
-      blurColor: Colors.black87,
-      colorOpacity: 0.6,
     ),
     decoration: const PageDecoration(
       fullScreen: true,
