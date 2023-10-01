@@ -5,15 +5,15 @@ import 'package:daily_mind/features/new_mix/constant/sounds.dart';
 import 'package:just_audio/just_audio.dart';
 
 class GaplessAudioPlayer {
-  final audioPlayer = AudioPlayer();
+  final player = AudioPlayer();
 
   late List<AudioSource> children;
 
-  Stream<bool> get playingStream => audioPlayer.playingStream;
+  Stream<bool> get playingStream => player.playingStream;
 
-  bool get isPlaying => audioPlayer.playing;
+  bool get isPlaying => player.playing;
 
-  void setSource(String id) async {
+  void onSetSource(String id) async {
     children = [];
     final paths = sounds[id] ?? [];
 
@@ -28,32 +28,32 @@ class GaplessAudioPlayer {
 
     final initialIndex = Random().nextInt(children.length);
 
-    await audioPlayer.setAudioSource(
+    await player.setAudioSource(
       playlist,
       initialIndex: initialIndex,
       initialPosition: Duration.zero,
     );
   }
 
-  void play() async {
+  void onPlay() async {
     try {
-      await audioPlayer.setLoopMode(LoopMode.all);
+      await player.setLoopMode(LoopMode.all);
     } catch (error) {
       logger.e(error);
     }
 
-    await audioPlayer.play();
+    player.play();
   }
 
-  void stop() async {
-    await audioPlayer.stop();
+  void onPause() async {
+    await player.pause();
   }
 
-  void setVolume(double volume) async {
-    await audioPlayer.setVolume(volume);
+  void onSetVolume(double volume) async {
+    await player.setVolume(volume);
   }
 
-  void dispose() async {
-    await audioPlayer.dispose();
+  void onDispose() async {
+    await player.dispose();
   }
 }

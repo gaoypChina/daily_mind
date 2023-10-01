@@ -1,4 +1,0 @@
-enum NetworkType {
-  offline,
-  online,
-}

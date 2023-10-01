@@ -1,8 +1,8 @@
 import 'package:daily_mind/common_applications/audio_handler.dart';
+import 'package:daily_mind/common_providers/base_audio_handler_provider.dart';
 import 'package:daily_mind/common_providers/config_provider.dart';
 import 'package:daily_mind/db/db.dart';
 import 'package:daily_mind/extensions/string.dart';
-import 'package:daily_mind/features/play_mix/presentation/play_mix_provider.dart';
 import 'package:daily_mind/features/setting_watcher/presentation/setting_watcher.dart';
 import 'package:daily_mind/features/settings/application/settings.dart';
 import 'package:daily_mind/router/router.dart';
@@ -25,10 +25,11 @@ class Init extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.read(configProvider);
-    final playMixNotifier = ref.read(playMixProvider.notifier);
+    final baseAudioHandlerNotifier =
+        ref.read(baseAudioHandlerProvider.notifier);
 
     useEffect(() {
-      playMixNotifier.setAudioHandler(audioHandler);
+      baseAudioHandlerNotifier.onSetAudioHandler(audioHandler);
 
       db.streamSetting('language').listen((setting) {
         if (setting.isNotEmpty) {

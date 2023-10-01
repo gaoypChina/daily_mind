@@ -1,6 +1,7 @@
 import 'package:daily_mind/features/app_navigation_bar/presentation/app_navigation_bar.dart';
 import 'package:daily_mind/features/app_navigation_bar/presentation/app_navigation_bar_provider.dart';
-import 'package:daily_mind/features/list_mix/presentation/list_mix.dart';
+import 'package:daily_mind/features/mini_player/presentation/mini_player_switcher.dart';
+import 'package:daily_mind/features/offline_list/presentation/offline_list.dart';
 import 'package:daily_mind/features/settings/pesentation/settings.dart';
 import 'package:daily_mind/features/stories/presentation/stories.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +20,7 @@ class Dashboard extends HookConsumerWidget {
 
     final body = useMemoized(() {
       if (appNavigationBarState.index == 0) {
-        return const ListMix();
+        return const OfflineList();
       } else if (appNavigationBarState.index == 1) {
         return const Stories();
       }
@@ -30,7 +31,16 @@ class Dashboard extends HookConsumerWidget {
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
-        child: body,
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            AnimatedSwitcher(
+              duration: kThemeChangeDuration,
+              child: body,
+            ),
+            const MiniPlayerSwitcher(),
+          ],
+        ),
       ),
       bottomNavigationBar: const AppNavigationBar(),
     );
