@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 
 class DiskPlayerCircle extends HookWidget {
   final bool isPlaying;
-  final String image;
+  final ImageProvider image;
 
   const DiskPlayerCircle({
     super.key,
@@ -42,11 +42,12 @@ class DiskPlayerCircle extends HookWidget {
           shape: BoxShape.circle,
           boxShadow: kElevationToShadow[4],
           image: DecorationImage(
-            image: AssetImage(image),
+            image: image,
+            fit: BoxFit.cover,
           ),
         ),
         width: context.width,
-        height: context.height / 2.5,
+        height: context.height / 2.75,
       ),
     );
   }

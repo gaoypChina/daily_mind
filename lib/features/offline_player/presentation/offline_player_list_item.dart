@@ -17,14 +17,11 @@ class OfflinePlayerListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
+    return GridView.builder(
       shrinkWrap: true,
       padding: padding,
       physics: const NeverScrollableScrollPhysics(),
       itemCount: items.length,
-      separatorBuilder: (context, index) {
-        return SizedBox(height: spacing(2));
-      },
       itemBuilder: (context, index) {
         final item = items[index];
 
@@ -33,6 +30,11 @@ class OfflinePlayerListItem extends StatelessWidget {
           item: item,
         );
       },
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 1,
+        childAspectRatio: 2,
+        mainAxisSpacing: spacing(2),
+      ),
     );
   }
 }

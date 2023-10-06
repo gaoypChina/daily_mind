@@ -60,14 +60,18 @@ class NewMix extends HookConsumerWidget {
           alignment: Alignment.center,
           children: [
             StackBackground(
-              image: appState.backgroundImage,
-              child: Container(
-                padding: EdgeInsets.only(bottom: spacing(3)),
-                child: const OfflineListSound(),
+              image: AssetImage(appState.backgroundImage),
+              child: SafeArea(
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: spacing(2),
+                  ),
+                  child: const OfflineListSound(),
+                ),
               ),
             ),
             Positioned(
-              bottom: spacing(3),
+              bottom: spacing(4),
               child: NewMixButtonSwitcher(
                 key: newMixButtonSwitcherKey,
               ),

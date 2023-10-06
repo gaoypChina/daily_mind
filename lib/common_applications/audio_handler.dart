@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:daily_mind/common_applications/assets.dart';
 import 'package:daily_mind/common_applications/gapless_audio_player.dart';
 import 'package:daily_mind/common_applications/online_audio_player.dart';
 import 'package:daily_mind/common_applications/time.dart';
-import 'package:daily_mind/common_domains/story.dart';
+import 'package:daily_mind/common_domains/item.dart';
+import 'package:daily_mind/constants/constants.dart';
 import 'package:daily_mind/constants/enum.dart';
 import 'package:daily_mind/db/schemas/playlist.dart';
 import 'package:daily_mind/features/offline_player/domain/offline_player_item.dart';
@@ -28,8 +30,12 @@ class DailyMindAudioHandler extends BaseAudioHandler {
     });
   }
 
-  void onInitPlaylist(List<PlaylistItem> items) {
+  void onInitPlaylist(
+    Playlist playlist,
+    List<PlaylistItem> items,
+  ) async {
     pause();
+    onClearPlayerItems();
 
     for (var item in items) {
       final player = GaplessAudioPlayer();
@@ -42,6 +48,14 @@ class DailyMindAudioHandler extends BaseAudioHandler {
         id: item.id,
       ));
 
+      mediaItem.add(
+        MediaItem(
+          id: '${playlist.id}',
+          title: playlist.title ?? appDescription,
+          artUri: await onGetSoundImageFromAsset(item.id),
+        ),
+      );
+
       networkType = NetworkType.offline;
 
       play();
@@ -49,16 +63,16 @@ class DailyMindAudioHandler extends BaseAudioHandler {
     }
   }
 
-  void onInitStory(Story story) async {
+  void onInitItem(Item item) async {
     pause();
 
-    await onlinePlayer.onInitSource(story.source, LoopMode.one);
+    await onlinePlayer.onInitSource(item.source, LoopMode.one);
 
     mediaItem.add(
       MediaItem(
-        id: story.source,
-        title: story.name,
-        artUri: Uri.parse(story.image),
+        id: item.source,
+        title: item.name,
+        artUri: Uri.parse(item.image),
         duration: onlinePlayer.player.duration,
       ),
     );
@@ -84,6 +98,14 @@ class DailyMindAudioHandler extends BaseAudioHandler {
     for (var playerItem in playerItems) {
       playerItem.player.onPause();
     }
+  }
+
+  void onClearPlayerItems() {
+    for (var playerItem in playerItems) {
+      playerItem.player.onDispose();
+    }
+
+    playerItems.clear();
   }
 
   void onClearMix() {}

@@ -7,6 +7,7 @@ import 'package:daily_mind/features/item_dismissible/presentation/dismissible.da
 import 'package:daily_mind/features/mini_player/domain/mini_player_state.dart';
 import 'package:daily_mind/features/mini_player/presentation/mini_player_provider.dart';
 import 'package:daily_mind/features/offline_list_chord_item/presentation/offline_list_chore_item_provider.dart';
+import 'package:daily_mind/features/offline_player/presentation/offline_player.dart';
 import 'package:daily_mind/features/sound_images_stack/presentation/sound_images_stack.dart';
 import 'package:daily_mind/theme/theme.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -34,9 +35,26 @@ class OfflineListChordItem extends HookConsumerWidget {
         ref.read(offlineListChoreItemProvider.notifier);
     final miniPlayerNotifier = ref.read(miniPlayerProvider.notifier);
 
+    final onOpenOfflinePlayer = useCallback(() {
+      miniPlayerNotifier.onHide();
+
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        builder: (context) {
+          return OfflinePlayer(playlistId: playlist.id);
+        },
+      ).then((value) => miniPlayerNotifier.onShow());
+    }, [
+      context,
+      playlist,
+    ]);
+
     final onPlayChord = useCallback(
       () {
-        offlineListChoreItemNotifier.onPlayChore(items);
+        offlineListChoreItemNotifier.onPlayChore(playlist, items);
 
         miniPlayerNotifier.onUpdateState(
           MiniPlayerState(
@@ -47,11 +65,15 @@ class OfflineListChordItem extends HookConsumerWidget {
             ),
             title: title.isEmpty ? appDescription : title,
             networkType: NetworkType.offline,
-            onPressed: () {},
+            onPressed: onOpenOfflinePlayer,
           ),
         );
       },
-      [title, items],
+      [
+        items,
+        onOpenOfflinePlayer,
+        title,
+      ],
     );
 
     return InkWell(
