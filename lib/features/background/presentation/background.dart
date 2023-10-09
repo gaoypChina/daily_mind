@@ -1,5 +1,5 @@
+import 'package:daily_mind/common_widgets/base_animated_opacity.dart';
 import 'package:flutter/material.dart';
-import 'package:get/utils.dart';
 
 class Background extends StatelessWidget {
   final ImageProvider image;
@@ -13,24 +13,23 @@ class Background extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: image,
-              fit: BoxFit.cover,
-              colorFilter: const ColorFilter.mode(
-                Colors.black38,
-                BlendMode.darken,
+        BaseAnimatedOpacity(
+          valueKey: ValueKey(image),
+          child: Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: image,
+                fit: BoxFit.cover,
               ),
             ),
           ),
         ),
         Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                context.theme.colorScheme.background.withOpacity(0.12),
-                context.theme.colorScheme.background.withOpacity(0.87),
+                Colors.black12,
+                Colors.black87,
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,

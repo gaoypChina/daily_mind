@@ -11,7 +11,6 @@ import 'package:daily_mind/constants/enum.dart';
 import 'package:daily_mind/db/schemas/playlist.dart';
 import 'package:daily_mind/features/offline_player/domain/offline_player_item.dart';
 import 'package:day_night_time_picker/day_night_time_picker.dart';
-import 'package:just_audio/just_audio.dart';
 
 class DailyMindAudioHandler extends BaseAudioHandler {
   Timer? timer;
@@ -30,7 +29,7 @@ class DailyMindAudioHandler extends BaseAudioHandler {
     });
   }
 
-  void onInitPlaylist(
+  void onInitOfflinePlaylist(
     Playlist playlist,
     List<PlaylistItem> items,
   ) async {
@@ -63,24 +62,48 @@ class DailyMindAudioHandler extends BaseAudioHandler {
     }
   }
 
-  void onInitItem(Item item) async {
+  void onInitItem(
+    Item item,
+    List<Item> fullItems,
+  ) async {
     pause();
 
-    await onlinePlayer.onInitSource(item.source, LoopMode.one);
-
-    mediaItem.add(
-      MediaItem(
-        id: item.source,
-        title: item.name,
-        artUri: Uri.parse(item.image),
-        duration: onlinePlayer.player.duration,
-      ),
+    await onlinePlayer.onInitSource(
+      item,
+      fullItems: fullItems,
     );
 
     networkType = NetworkType.online;
 
     play();
-    onInitPlaybackState();
+    onInitPlaybackState(NetworkType.online);
+    onOnlinePlayerPlayStateChanged();
+  }
+
+  void onOnlinePlayerPlayStateChanged() {
+    onlinePlayer.player.positionStream.listen((newDuration) {
+      playbackState.add(
+        playbackState.value.copyWith(updatePosition: newDuration),
+      );
+    });
+
+    onlinePlayer.player.currentIndexStream.listen((index) {
+      final currentIndex = index ?? 0;
+      final sequence = onlinePlayer.player.audioSource?.sequence ?? [];
+
+      if (sequence.isNotEmpty) {
+        final item = sequence[currentIndex];
+
+        mediaItem.add(
+          MediaItem(
+            id: item.tag.source,
+            title: item.tag.name,
+            artUri: Uri.parse(item.tag.image),
+            duration: onlinePlayer.player.duration,
+          ),
+        );
+      }
+    });
   }
 
   void onUpdateVolume(double volume, String itemId, int playlistId) {
@@ -114,12 +137,20 @@ class DailyMindAudioHandler extends BaseAudioHandler {
     onlinePlayer.onDispose();
   }
 
-  void onPauseStory() {
+  void onPauseItem() {
     onlinePlayer.onPause();
   }
 
-  void onPlayStory() {
-    onlinePlayer.player.play();
+  void onPlayItem() {
+    onlinePlayer.onPlay();
+  }
+
+  void onNextItem() {
+    onlinePlayer.player.seekToNext();
+  }
+
+  void onPreviousItem() {
+    onlinePlayer.player.seekToPrevious();
   }
 
   void onDispose() {
@@ -128,14 +159,23 @@ class DailyMindAudioHandler extends BaseAudioHandler {
     }
   }
 
-  void onInitPlaybackState() async {
+  void onInitPlaybackState([NetworkType type = NetworkType.offline]) async {
+    final controls = [
+      MediaControl.pause,
+      MediaControl.play,
+    ];
+
+    if (type == NetworkType.online) {
+      controls.addAll([
+        MediaControl.skipToNext,
+        MediaControl.skipToPrevious,
+      ]);
+    }
+
     playbackState.add(
       playbackState.value.copyWith(
         playing: true,
-        controls: [
-          MediaControl.pause,
-          MediaControl.play,
-        ],
+        controls: controls,
       ),
     );
   }
@@ -145,8 +185,9 @@ class DailyMindAudioHandler extends BaseAudioHandler {
     if (networkType == NetworkType.offline) {
       onPlayMix();
     } else {
-      onPlayStory();
+      onPlayItem();
     }
+
     playbackState.add(playbackState.value.copyWith(playing: true));
 
     return super.play();
@@ -155,9 +196,23 @@ class DailyMindAudioHandler extends BaseAudioHandler {
   @override
   Future<void> pause() async {
     onPauseMix();
-    onPauseStory();
+    onPauseItem();
     playbackState.add(playbackState.value.copyWith(playing: false));
 
     return super.pause();
+  }
+
+  @override
+  Future<void> skipToNext() {
+    onlinePlayer.player.seekToNext();
+
+    return super.skipToNext();
+  }
+
+  @override
+  Future<void> skipToPrevious() {
+    onlinePlayer.player.seekToPrevious();
+
+    return super.skipToPrevious();
   }
 }
