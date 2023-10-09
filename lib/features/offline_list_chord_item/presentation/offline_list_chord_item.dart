@@ -1,11 +1,11 @@
+import 'package:daily_mind/common_widgets/base_mini_player/presentation/base_mini_player_provider.dart';
 import 'package:daily_mind/constants/constants.dart';
 import 'package:daily_mind/constants/enum.dart';
 import 'package:daily_mind/db/db.dart';
 import 'package:daily_mind/db/schemas/playlist.dart';
 import 'package:daily_mind/extensions/string.dart';
 import 'package:daily_mind/features/item_dismissible/presentation/dismissible.dart';
-import 'package:daily_mind/features/mini_player/domain/mini_player_state.dart';
-import 'package:daily_mind/features/mini_player/presentation/mini_player_provider.dart';
+import 'package:daily_mind/common_widgets/base_mini_player/domain/mini_player_state.dart';
 import 'package:daily_mind/features/offline_list_chord_item/presentation/offline_list_chore_item_provider.dart';
 import 'package:daily_mind/features/offline_player/presentation/offline_player.dart';
 import 'package:daily_mind/features/sound_images_stack/presentation/sound_images_stack.dart';
@@ -33,10 +33,10 @@ class OfflineListChordItem extends HookConsumerWidget {
     final title = playlist.title ?? emptyString;
     final offlineListChoreItemNotifier =
         ref.read(offlineListChoreItemProvider.notifier);
-    final miniPlayerNotifier = ref.read(miniPlayerProvider.notifier);
+    final baseMiniPlayerNotifier = ref.read(baseMiniPlayerProvider.notifier);
 
     final onOpenOfflinePlayer = useCallback(() {
-      miniPlayerNotifier.onHide();
+      baseMiniPlayerNotifier.onHide();
 
       showModalBottomSheet(
         context: context,
@@ -46,7 +46,7 @@ class OfflineListChordItem extends HookConsumerWidget {
         builder: (context) {
           return OfflinePlayer(playlistId: playlist.id);
         },
-      ).then((value) => miniPlayerNotifier.onShow());
+      ).then((value) => baseMiniPlayerNotifier.onShow());
     }, [
       context,
       playlist,
@@ -54,25 +54,19 @@ class OfflineListChordItem extends HookConsumerWidget {
 
     final onPlayChord = useCallback(
       () {
-        offlineListChoreItemNotifier.onPlayChore(playlist, items);
+        offlineListChoreItemNotifier.onPlayChore(playlist);
 
-        miniPlayerNotifier.onUpdateState(
+        baseMiniPlayerNotifier.onUpdateState(
           MiniPlayerState(
             isShow: true,
-            image: SoundImagesStack(
-              items: items,
-              size: 6,
-            ),
-            title: title.isEmpty ? appDescription : title,
             networkType: NetworkType.offline,
-            onPressed: onOpenOfflinePlayer,
+            onTap: onOpenOfflinePlayer,
           ),
         );
       },
       [
-        items,
+        playlist,
         onOpenOfflinePlayer,
-        title,
       ],
     );
 
@@ -84,12 +78,12 @@ class OfflineListChordItem extends HookConsumerWidget {
         child: ItemDismissible(
           key: key,
           dismissible: DismissiblePane(onDismissed: () {
-            db.deletePlaylist(playlist.id);
+            db.onDeletePlaylist(playlist.id);
           }),
           endActionPaneChildren: [
             SlidableAction(
               onPressed: (context) {
-                db.deletePlaylist(playlist.id);
+                db.onDeletePlaylist(playlist.id);
               },
               backgroundColor: context.theme.colorScheme.error,
               label: 'delete'.tr(),
