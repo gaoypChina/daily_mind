@@ -15,11 +15,14 @@ class Background extends StatelessWidget {
       children: [
         BaseAnimatedOpacity(
           valueKey: ValueKey(image),
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: image,
-                fit: BoxFit.cover,
+          child: Opacity(
+            opacity: 0.6,
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: image,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
@@ -28,8 +31,8 @@ class Background extends StatelessWidget {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Colors.black12,
-                Colors.black87,
+                Colors.black54,
+                Colors.black,
               ],
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
