@@ -1,20 +1,29 @@
-import 'package:daily_mind/common_domains/item.dart';
+import 'package:daily_mind/common_providers/base_audio_handler_provider.dart';
 import 'package:daily_mind/features/online_item/presentation/online_item.dart';
 import 'package:daily_mind/features/online_list_related_header/presentation/online_list_related_header.dart';
 import 'package:daily_mind/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/get.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class OnlineListRelated extends StatelessWidget {
-  final List<Item> items;
-
-  const OnlineListRelated({
-    super.key,
-    required this.items,
-  });
+class OnlineListRelated extends HookConsumerWidget {
+  const OnlineListRelated({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final baseAudioHandler = ref.watch(baseAudioHandlerProvider);
+
+    final sequenceSnapshot =
+        useStream(baseAudioHandler.onlinePlayer.sequenceStream);
+    final sequence = sequenceSnapshot.data ?? [];
+
+    final onTap = useCallback((int index) {
+      baseAudioHandler.onOnlinePlayerPlayFromIndex(index);
+    }, [
+      sequence,
+    ]);
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -22,18 +31,19 @@ class OnlineListRelated extends StatelessWidget {
         ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          itemCount: items.length,
+          itemCount: sequence.length,
           separatorBuilder: (context, index) {
             return SizedBox(height: spacing());
           },
           itemBuilder: (context, index) {
-            final item = items[index];
+            final s = sequence[index];
+            final tag = s.tag;
 
             return OnlineItem(
-              onTap: () {},
-              image: item.image,
+              onTap: () => onTap(index),
+              image: tag.image,
               title: Text(
-                item.name,
+                tag.name,
                 style: context.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w500,
                 ),
