@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:audio_service/audio_service.dart';
+import 'package:audio_session/audio_session.dart';
 import 'package:daily_mind/common_applications/assets.dart';
 import 'package:daily_mind/common_applications/gapless_audio_player.dart';
 import 'package:daily_mind/common_applications/online_audio_player/application/online_audio_player.dart';
+import 'package:daily_mind/common_applications/safe_builder.dart';
 import 'package:daily_mind/common_applications/time.dart';
 import 'package:daily_mind/common_domains/item.dart';
 import 'package:daily_mind/constants/constants.dart';
@@ -15,11 +17,23 @@ import 'package:day_night_time_picker/day_night_time_picker.dart';
 import 'package:rxdart/rxdart.dart';
 
 class DailyMindAudioHandler extends BaseAudioHandler with SeekHandler {
+  bool isAutoPlayNext = true;
   List<OfflinePlayerItem> offlinePlayerItems = [];
   NetworkType networkType = NetworkType.none;
   OnlineAudioPlayer onlinePlayer = OnlineAudioPlayer();
   StreamController<int> streamPlaylistId = BehaviorSubject();
+  StreamSubscription<Duration?>? durationStreamSubscription;
+  StreamSubscription<Duration>? positionStreamSubscription;
   Timer? timer;
+
+  DailyMindAudioHandler() {
+    onInit();
+  }
+
+  void onInit() async {
+    final session = await AudioSession.instance;
+    await session.configure(const AudioSessionConfiguration.music());
+  }
 
   void onStartTimer(Time time) {
     timer?.cancel();
@@ -37,8 +51,8 @@ class DailyMindAudioHandler extends BaseAudioHandler with SeekHandler {
   }
 
   void onInitOffline(Playlist playlist) async {
-    pause();
-    onClearPlayerItems();
+    onClearOfflinePlayerItems();
+    onPauseOnline();
 
     streamPlaylistId.add(playlist.id);
 
@@ -72,50 +86,6 @@ class DailyMindAudioHandler extends BaseAudioHandler with SeekHandler {
     }
   }
 
-  void onInitOnline(
-    Item item,
-    List<Item> items,
-  ) async {
-    pause();
-
-    await onlinePlayer.onInitSource(
-      item,
-      items: items,
-    );
-
-    networkType = NetworkType.online;
-
-    play();
-    onInitPlaybackState(NetworkType.online);
-    onOnlinePlayerPlayStateChanged();
-  }
-
-  void onOnlinePlayerPlayStateChanged() {
-    onlinePlayer.positionStream.listen((newDuration) {
-      playbackState.add(
-        playbackState.value.copyWith(updatePosition: newDuration),
-      );
-    });
-
-    onlinePlayer.currentIndexStream.listen((index) {
-      final currentIndex = index ?? 0;
-      final sequence = onlinePlayer.audioSource?.sequence ?? [];
-
-      if (sequence.isNotEmpty) {
-        final item = sequence[currentIndex];
-
-        mediaItem.add(
-          MediaItem(
-            id: item.tag.source,
-            title: item.tag.name,
-            artUri: Uri.parse(item.tag.image),
-            duration: onlinePlayer.duration,
-          ),
-        );
-      }
-    });
-  }
-
   void onUpdateOfflineVolume(double volume, String itemId, int playlistId) {
     final offlinePlayerItem =
         offlinePlayerItems.firstWhere((item) => item.id == itemId);
@@ -147,12 +117,68 @@ class DailyMindAudioHandler extends BaseAudioHandler with SeekHandler {
     }
   }
 
-  void onClearPlayerItems() {
+  void onClearOfflinePlayerItems() {
     for (var offlinePlayerItem in offlinePlayerItems) {
       offlinePlayerItem.player.dispose();
     }
 
     offlinePlayerItems.clear();
+  }
+
+  void onOfflineDispose() {
+    for (var offlinePlayerItem in offlinePlayerItems) {
+      offlinePlayerItem.player.dispose();
+    }
+  }
+
+  void onInitOnline(List<Item> items) async {
+    onPauseOffline();
+
+    onlinePlayer.onInitSource(items);
+
+    networkType = NetworkType.online;
+
+    onInitPlaybackState(NetworkType.online);
+    onOnlinePlayerPlayStateChanged();
+  }
+
+  void onOnlinePlayerPlayStateChanged() {
+    positionStreamSubscription?.cancel();
+    durationStreamSubscription?.cancel();
+
+    positionStreamSubscription =
+        onlinePlayer.positionStream.listen((newDuration) {
+      playbackState.add(
+        playbackState.value.copyWith(updatePosition: newDuration),
+      );
+
+      final duration = onlinePlayer.duration;
+
+      safeValueBuilder(duration, (value) {
+        if (value <= newDuration && isAutoPlayNext) {
+          skipToNext();
+        }
+      });
+    });
+
+    durationStreamSubscription = onlinePlayer.durationStream.listen((duration) {
+      safeValueBuilder(duration, (value) {
+        if (value != Duration.zero) {
+          final tag = onlinePlayer.sequenceState?.currentSource?.tag;
+
+          safeValueBuilder<dynamic>(tag, (item) {
+            mediaItem.add(
+              MediaItem(
+                id: item.source,
+                title: item.name,
+                artUri: Uri.parse(item.image),
+                duration: value,
+              ),
+            );
+          });
+        }
+      });
+    });
   }
 
   void onClearOnline() {
@@ -167,10 +193,8 @@ class DailyMindAudioHandler extends BaseAudioHandler with SeekHandler {
     onlinePlayer.play();
   }
 
-  void onDispose() {
-    for (var offlinePlayerItem in offlinePlayerItems) {
-      offlinePlayerItem.player.dispose();
-    }
+  void onOnlineUpdateAutoPlayNext(bool newIsAutoPlayNext) {
+    isAutoPlayNext = newIsAutoPlayNext;
   }
 
   void onInitPlaybackState([NetworkType type = NetworkType.offline]) async {
@@ -228,6 +252,7 @@ class DailyMindAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> skipToNext() {
+    onPauseOnline();
     onlinePlayer.onSeekNext();
 
     return super.skipToNext();
@@ -235,6 +260,7 @@ class DailyMindAudioHandler extends BaseAudioHandler with SeekHandler {
 
   @override
   Future<void> skipToPrevious() {
+    onPauseOnline();
     onlinePlayer.onSeekPrevious();
 
     return super.skipToPrevious();
@@ -243,6 +269,7 @@ class DailyMindAudioHandler extends BaseAudioHandler with SeekHandler {
   @override
   Future<void> seek(Duration position) {
     onlinePlayer.seek(position);
+
     return super.seek(position);
   }
 }

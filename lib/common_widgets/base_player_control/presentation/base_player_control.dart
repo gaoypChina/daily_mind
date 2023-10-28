@@ -1,4 +1,4 @@
-import 'package:daily_mind/common_applications/base_audio_handler.dart';
+import 'package:daily_mind/common_applications/base_audio_handler/application/base_audio_handler.dart';
 import 'package:daily_mind/common_widgets/base_player_control/presentation/base_player_actions.dart';
 import 'package:daily_mind/common_widgets/base_player_control/presentation/base_player_time.dart';
 import 'package:flutter/material.dart';
@@ -21,8 +21,13 @@ class BasePlayerControl extends HookWidget {
     final player = audioHandler.onlinePlayer;
     final duration = player.duration;
 
-    final positionSnapshot = useStream(player.positionStream);
-    final playingSnapshot = useStream(player.playingStream);
+    final positionStreamMemoized = useMemoized(() => player.positionStream, []);
+
+    final positionSnapshot = useStream(positionStreamMemoized);
+
+    final playingStreamMemoized = useMemoized(() => player.playingStream, []);
+
+    final playingSnapshot = useStream(playingStreamMemoized);
 
     final seconds = duration?.inSeconds ?? 0;
     final isPlaying = playingSnapshot.data ?? false;

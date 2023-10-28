@@ -15,10 +15,10 @@ class BaseSliderTheme extends StatelessWidget {
     return SliderTheme(
       data: SliderThemeData(
         activeTrackColor: context.theme.primaryColor,
+        inactiveTrackColor: context.theme.primaryColorLight.withOpacity(0.4),
         showValueIndicator: ShowValueIndicator.always,
         overlayShape: SliderComponentShape.noOverlay,
-        thumbShape: SliderComponentShape.noThumb,
-        trackHeight: spacing(),
+        trackHeight: spacing(2),
       ),
       child: slider,
     );

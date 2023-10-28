@@ -1,26 +1,11 @@
+import 'package:collection/collection.dart';
 import 'package:daily_mind/common_applications/logger.dart';
 import 'package:daily_mind/common_applications/online_audio_player/domain/online_audio_player_index_state.dart';
 import 'package:daily_mind/common_domains/item.dart';
 import 'package:just_audio/just_audio.dart';
 
 class OnlineAudioPlayer extends AudioPlayer {
-  List<Item> backupItems = [];
-
-  Future<void> onInitSource(
-    Item item, {
-    List<Item> items = const [],
-    LoopMode loopMode = LoopMode.all,
-  }) async {
-    try {
-      onSetAudioSource(items);
-
-      backupItems = items;
-    } catch (error) {
-      logger.e(error);
-    }
-  }
-
-  OnlineAudioPlayerIndexState onGetIndexState() {
+  OnlineAudioPlayerIndexState get indexState {
     int index = currentIndex ?? 0;
     int sequenceLength = sequence?.length ?? 0;
 
@@ -30,61 +15,81 @@ class OnlineAudioPlayer extends AudioPlayer {
     );
   }
 
+  List<Item> get previousItems {
+    final currentSequence = sequence ?? [];
+
+    return currentSequence.map((s) => s.tag as Item).toList();
+  }
+
+  void onInitSource(List<Item> items) {
+    final newItems = List<Item>.from(items);
+    final playItem = newItems.removeAt(0);
+    final newList = [...newItems, playItem];
+    final initialIndex = newList.indexOf(playItem);
+
+    onSetAudioSource(newList, initialIndex: initialIndex);
+  }
+
   void onSetAudioSource(
-    List<Item> items, {
+    List<Item> newList, {
     int initialIndex = 0,
+    LoopMode loopMode = LoopMode.one,
   }) async {
-    final beginItems = items.sublist(0, initialIndex);
-    final restItems = items.skip(initialIndex).toList();
-    final startItem = restItems.removeAt(0);
+    try {
+      await pause();
 
-    final newItems = [...restItems, ...beginItems, startItem];
-    final index = newItems.indexOf(startItem);
+      final children = newList
+          .map(
+            (item) => LockCachingAudioSource(
+              Uri.parse(item.source),
+              tag: item,
+            ),
+          )
+          .toList();
 
-    final fullAudioSources = newItems
-        .map(
-          (item) => LockCachingAudioSource(
-            Uri.parse(item.source),
-            tag: item,
-          ),
-        )
-        .toList();
+      final source = ConcatenatingAudioSource(children: children);
 
-    final concatenatingAudioSource = ConcatenatingAudioSource(
-      children: fullAudioSources,
-    );
+      await setAudioSource(
+        source,
+        initialIndex: initialIndex,
+      );
 
-    await setAudioSource(
-      concatenatingAudioSource,
-      preload: false,
-    );
+      await setLoopMode(loopMode);
 
-    await seek(Duration.zero, index: index);
-
-    backupItems = newItems;
+      await play();
+    } catch (error) {
+      logger.e(error);
+    }
   }
 
   void onSeekToIndex(int index) async {
-    onSetAudioSource(backupItems, initialIndex: index);
+    final currentItems = previousItems;
+    final topItems = currentItems.sublist(0, index);
+    final restItems = currentItems.whereNot((element) {
+      return topItems.contains(element);
+    }).toList();
+    final playItem = restItems.removeAt(0);
+    final newList = [...restItems, ...topItems, playItem];
+    final initialIndex = newList.indexOf(playItem);
+
+    onSetAudioSource(newList, initialIndex: initialIndex);
   }
 
   void onSeekNext() {
-    final indexState = onGetIndexState();
+    final currentItems = previousItems;
+    final playItem = currentItems.removeAt(0);
+    final newList = [...currentItems, playItem];
+    final initialIndex = newList.indexOf(playItem);
 
-    if (indexState.isCanMoveNext) {
-      onSeekToIndex(indexState.nextIndex);
-    } else {
-      onSeekToIndex(indexState.firstIndex);
-    }
+    onSetAudioSource(newList, initialIndex: initialIndex);
   }
 
   void onSeekPrevious() {
-    final indexState = onGetIndexState();
+    final currentItems = previousItems;
+    final lastItem = currentItems.removeLast();
 
-    if (indexState.isCanMovePrevious) {
-      onSeekToIndex(indexState.previousIndex);
-    } else {
-      onSeekToIndex(indexState.lastIndex);
-    }
+    final newList = [lastItem, ...currentItems];
+
+    onSetAudioSource(newList, initialIndex: indexState.lastIndex);
   }
 }
