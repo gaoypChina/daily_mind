@@ -1,10 +1,10 @@
 import 'package:daily_mind/theme/theme.dart';
 import 'package:flutter/material.dart';
 
-class BaseCardContent extends StatelessWidget {
+class BaseContainer extends StatelessWidget {
   final Widget child;
 
-  const BaseCardContent({
+  const BaseContainer({
     super.key,
     required this.child,
   });

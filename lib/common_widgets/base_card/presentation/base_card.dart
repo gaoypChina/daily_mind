@@ -1,4 +1,3 @@
-import 'package:daily_mind/common_widgets/base_card/presentation/base_card_content.dart';
 import 'package:daily_mind/common_widgets/base_card/presentation/base_card_gradient.dart';
 import 'package:daily_mind/common_widgets/base_card/presentation/base_card_image.dart';
 import 'package:daily_mind/common_widgets/base_null_builder.dart';
@@ -12,11 +11,11 @@ class BaseCard extends HookWidget {
   final double? imageHeight;
   final ImageProvider image;
   final VoidCallback? onTap;
-  final Widget child;
+  final Widget content;
 
   const BaseCard({
     super.key,
-    required this.child,
+    required this.content,
     required this.image,
     this.imageHeight,
     this.onTap,
@@ -49,7 +48,7 @@ class BaseCard extends HookWidget {
                   imageHeight: imageHeight,
                 ),
                 BaseCardGradient(color: color),
-                BaseCardContent(child: child),
+                content,
                 BaseNullBuilder(
                   value: onTap,
                   builder: (onTap) {

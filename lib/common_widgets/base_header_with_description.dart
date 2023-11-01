@@ -31,7 +31,7 @@ class BaseHeaderWithDescription extends StatelessWidget {
                   Flexible(
                     child: Text(
                       name,
-                      style: context.textTheme.bodyMedium
+                      style: context.textTheme.bodyLarge
                           ?.copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -42,8 +42,9 @@ class BaseHeaderWithDescription extends StatelessWidget {
           Flexible(
             child: Text(
               description,
-              style: context.textTheme.labelMedium?.copyWith(
+              style: context.textTheme.bodyMedium?.copyWith(
                 fontWeight: FontWeight.w500,
+                color: secondaryTextColor,
               ),
             ),
           )
