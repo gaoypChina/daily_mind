@@ -58,11 +58,11 @@ class MixEditorItem extends HookWidget {
     }, []);
 
     return BaseMixEditorItem(
-      volumeKey: volumeKey,
       image: soundItem.image,
       initVolume: offlineMixEditorItemState.volume,
       name: soundItem.name.tr(),
       onVolumeChanged: onVolumeChanged,
+      volumeKey: volumeKey,
       prefixChild: TogglePlayModeButton(
         isPlaying: isPlaying,
         onPause: player.pause,
