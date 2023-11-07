@@ -1,9 +1,10 @@
+import 'package:daily_mind/theme/common.dart';
 import 'package:daily_mind/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class BaseSliderTheme extends StatelessWidget {
-  final Slider slider;
+  final Widget slider;
 
   const BaseSliderTheme({
     super.key,
@@ -18,10 +19,14 @@ class BaseSliderTheme extends StatelessWidget {
         inactiveTrackColor: context.theme.primaryColorLight.withOpacity(0.4),
         showValueIndicator: ShowValueIndicator.always,
         overlayShape: SliderComponentShape.noOverlay,
-        thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),
-        trackHeight: spacing(),
+        thumbShape: SliderComponentShape.noThumb,
+        trackHeight: spacing(2),
+        tickMarkShape: SliderTickMarkShape.noTickMark,
       ),
-      child: slider,
+      child: ClipRRect(
+        borderRadius: circularRadius(2),
+        child: slider,
+      ),
     );
   }
 }

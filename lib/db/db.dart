@@ -1,6 +1,7 @@
 import 'package:daily_mind/common_applications/safe_builder.dart';
 import 'package:daily_mind/db/schemas/first_time.dart';
 import 'package:daily_mind/db/schemas/playlist.dart';
+import 'package:daily_mind/db/schemas/pomodoro.dart';
 import 'package:daily_mind/db/schemas/settings.dart';
 import 'package:daily_mind/features/offline_mix_editor/domain/offline_mix_editor_item_state.dart';
 import 'package:isar/isar.dart';
@@ -17,6 +18,7 @@ class Db {
         FirstTimeSchema,
         PlaylistSchema,
         SettingsSchema,
+        PomodoroSchema,
       ],
       directory: dir.path,
     );
@@ -153,6 +155,20 @@ class Db {
 
     isar.writeTxnSync(() {
       isar.playlists.putSync(playlist);
+    });
+  }
+
+  Stream<List<Pomodoro>> onStreamPomodoros() {
+    return isar.pomodoros.where(sort: Sort.desc).anyId().watch();
+  }
+
+  List<Pomodoro> onGetPomodoros() {
+    return isar.pomodoros.where(sort: Sort.desc).anyId().findAllSync();
+  }
+
+  void onAddANewPomodoro(Pomodoro pomodoro) {
+    isar.writeTxnSync(() {
+      isar.pomodoros.putSync(pomodoro);
     });
   }
 }

@@ -18,7 +18,7 @@ class BasePlayerInformation extends StatelessWidget {
       padding: EdgeInsets.all(spacing(2)),
       decoration: BoxDecoration(
         color: context.theme.cardColor,
-        borderRadius: BorderRadius.circular(spacing(2)),
+        borderRadius: circularRadius(2),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -26,8 +26,9 @@ class BasePlayerInformation extends StatelessWidget {
           [
             Text(
               category.name,
-              style: context.textTheme.bodyLarge
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: context.textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(
               category.description,
