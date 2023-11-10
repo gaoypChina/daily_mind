@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 2.1.0+8
 
 environment:
-  sdk: '>=2.19.6 <3.0.0'
+  sdk: '>=3.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -86,6 +86,9 @@ dependencies:
   group_button: ^5.3.3
   timer_count_down: ^2.2.2
   percent_indicator: ^4.2.3
+  flutter_local_notifications: ^16.1.0
+  pausable_timer: ^3.1.0+3
+  adaptive_dialog: ^1.10.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -129,6 +132,7 @@ flutter:
     - assets/images/background/
     - assets/lottie/
     - assets/audios/
+    - assets/audios/sound-effects/
     - assets/audios/fire/
     - assets/audios/forest/
     - assets/audios/rain/

@@ -1,11 +1,11 @@
 part of 'base_audio_handler.dart';
 
-extension BaseOfflinePlayer on DailyMindAudioHandler {
+extension BaseOfflinePlayer on DailyMindBackgroundHandler {
   void onInitOffline(Playlist playlist) async {
-    onClearOffline();
-    onDisposeOnline();
+    onOfflineDispose();
+    onOnlineDispose();
 
-    streamPlaylistId.add(playlist.id);
+    onStreamPlaylistId.add(playlist.id);
 
     final items = playlist.items ?? [];
     final firstItem = items.first;
@@ -32,10 +32,24 @@ extension BaseOfflinePlayer on DailyMindAudioHandler {
       ),
     );
 
-    onSetNetwork(NetworkType.offline);
+    audioType = AudioTypes.offline;
 
     play();
     onInitPlaybackState();
+  }
+
+  void onInitPlaybackState() async {
+    final controls = [
+      MediaControl.pause,
+      MediaControl.play,
+    ];
+
+    playbackState.add(
+      playbackState.value.copyWith(
+        playing: true,
+        controls: controls,
+      ),
+    );
   }
 
   void onUpdateOfflineVolume(double volume, String itemId, int playlistId) {
@@ -69,15 +83,10 @@ extension BaseOfflinePlayer on DailyMindAudioHandler {
     }
   }
 
-  void onClearOffline() {
-    onOfflineDispose();
-
-    offlinePlayerItems.clear();
-  }
-
   void onOfflineDispose() async {
     for (var offlinePlayerItem in offlinePlayerItems) {
       await offlinePlayerItem.player.onDispose();
     }
+    offlinePlayerItems.clear();
   }
 }

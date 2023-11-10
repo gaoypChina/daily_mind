@@ -3,8 +3,10 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-const background = Color(0xFF12130f);
-final secondaryTextColor = Colors.white.withOpacity(0.8);
+const background = Color(0xFF07020D);
+const celadon = Color(0xFFB0F2B4);
+const maize = Color(0xFFFFF07C);
+const secondaryTextColor = Colors.white70;
 
 final fontFamily = GoogleFonts.inter().fontFamily;
 

@@ -1,41 +1,28 @@
-import 'package:daily_mind/common_applications/date_formatter.dart';
-import 'package:daily_mind/theme/theme.dart';
+import 'package:daily_mind/features/focus_mode_timer/presentation/focus_mode_timer_display_text.dart';
+import 'package:daily_mind/features/timer_circular_animate/presentation/timer_circular_animate.dart';
 import 'package:flutter/material.dart';
-import 'package:get/utils.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
-import 'package:timer_count_down/timer_count_down.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
-class FocusModeTimer extends StatelessWidget {
-  const FocusModeTimer({super.key});
+class FocusModeTimer extends HookWidget {
+  final bool isPlaying;
+  final int remainingSeconds;
+  final int seconds;
+
+  const FocusModeTimer({
+    super.key,
+    required this.isPlaying,
+    required this.remainingSeconds,
+    required this.seconds,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Countdown(
-      seconds: 1500,
-      interval: const Duration(seconds: 1),
-      build: (context, seconds) {
-        final percent = (seconds / 1500);
+    final percent = (remainingSeconds / seconds);
 
-        return SizedBox(
-          height: context.height / 2,
-          child: CircularPercentIndicator(
-            radius: context.width / 3,
-            lineWidth: spacing(2),
-            percent: percent,
-            center: Text(
-              dateFormatter.onFormatDuration(
-                Duration(
-                  seconds: seconds.toInt(),
-                ),
-              ),
-              style: context.textTheme.displayLarge,
-            ),
-            circularStrokeCap: CircularStrokeCap.round,
-            backgroundColor: context.theme.cardColor,
-            progressColor: context.theme.primaryColorDark,
-          ),
-        );
-      },
+    return TimerCircularAnimate(
+      percent: percent,
+      animate: isPlaying,
+      center: FocusModeTimerDisplayText(seconds: remainingSeconds),
     );
   }
 }

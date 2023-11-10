@@ -1,6 +1,7 @@
 import 'package:audio_service/audio_service.dart';
-import 'package:daily_mind/common_applications/base_audio_handler/application/base_audio_handler.dart';
+import 'package:daily_mind/common_applications/base_audio_handler/base_audio_handler.dart';
 import 'package:daily_mind/common_applications/env.dart';
+import 'package:daily_mind/common_applications/local_notifications.dart';
 import 'package:daily_mind/common_widgets/base_internet_connection_checker/presentation/base_internet_connection_checker.dart';
 import 'package:daily_mind/db/db.dart';
 import 'package:daily_mind/features/init/presentation/init.dart';
@@ -13,6 +14,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   final engine = WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+  await localNotifications.onInit();
 
   await Supabase.initialize(
     url: Env.supaBaseProjectUrl,
@@ -21,10 +23,10 @@ void main() async {
 
   await db.onInit();
 
-  final audioHandler = await AudioService.init(
-    builder: () => DailyMindAudioHandler(),
+  final backgroundHandler = await AudioService.init(
+    builder: () => DailyMindBackgroundHandler(),
     config: const AudioServiceConfig(
-      androidNotificationChannelId: 'dev.andyng.dailymind.channel.audio',
+      androidNotificationChannelId: 'dev.andyng.dailymind.channel.background',
       androidNotificationChannelName: 'Music Playback',
     ),
   );
@@ -35,7 +37,7 @@ void main() async {
         child: BaseInternetConnectionChecker(
           child: Init(
             engine: engine,
-            audioHandler: audioHandler,
+            backgroundHandler: backgroundHandler,
           ),
         ),
       ),

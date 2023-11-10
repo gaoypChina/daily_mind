@@ -1,24 +1,24 @@
-import 'package:daily_mind/common_applications/base_audio_handler/application/base_audio_handler.dart';
+import 'package:daily_mind/common_applications/base_audio_handler/base_audio_handler.dart';
 import 'package:daily_mind/common_widgets/base_player_control/presentation/base_player_actions.dart';
 import 'package:daily_mind/common_widgets/base_player_control/presentation/base_player_time.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
 class BasePlayerControl extends HookWidget {
-  final DailyMindAudioHandler audioHandler;
+  final DailyMindBackgroundHandler backgroundHandler;
   final VoidCallback? onNext;
   final VoidCallback? onPrevious;
 
   const BasePlayerControl({
     super.key,
-    required this.audioHandler,
+    required this.backgroundHandler,
     this.onNext,
     this.onPrevious,
   });
 
   @override
   Widget build(BuildContext context) {
-    final player = audioHandler.onlinePlayer;
+    final player = backgroundHandler.onlinePlayer;
     final duration = player.duration;
 
     final positionStreamMemoized = useMemoized(() => player.positionStream, []);
@@ -36,13 +36,13 @@ class BasePlayerControl extends HookWidget {
       children: [
         BasePlayerTime(
           max: seconds,
-          onChangeEnd: audioHandler.onlinePlayer.seek,
+          onChangeEnd: backgroundHandler.onlinePlayer.seek,
           value: positionSnapshot.data?.inSeconds ?? 0,
         ),
         BasePlayerActions(
           isPlaying: isPlaying,
-          onPlay: audioHandler.play,
-          onPause: audioHandler.pause,
+          onPlay: backgroundHandler.play,
+          onPause: backgroundHandler.pause,
           onNext: onNext,
           onPrevious: onPrevious,
         ),

@@ -1,4 +1,4 @@
-final offlineAudios = {
+final offlineAudioSources = {
   'fire': [
     'assets/audios/fire/fire-1.mp3',
     'assets/audios/fire/fire-2.mp3',

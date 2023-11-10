@@ -1,4 +1,4 @@
-import 'package:daily_mind/common_applications/base_audio_handler/application/base_audio_handler.dart';
+import 'package:daily_mind/common_applications/base_audio_handler/base_audio_handler.dart';
 import 'package:daily_mind/common_providers/base_audio_handler_provider.dart';
 import 'package:daily_mind/common_widgets/base_content_header.dart';
 import 'package:daily_mind/common_widgets/base_text_field.dart';
@@ -26,11 +26,11 @@ class OfflinePlayerBottom extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final baseAudioHandler = ref.watch(baseAudioHandlerProvider);
+    final baseBackgroundHandler = ref.watch(baseBackgroundHandlerProvider);
 
     final onChanged = useCallback(
       (String name) {
-        baseAudioHandler.onUpdateOfflinePlaylistTitle(name, playlistId);
+        baseBackgroundHandler.onUpdateOfflinePlaylistTitle(name, playlistId);
       },
       [playlistId],
     );

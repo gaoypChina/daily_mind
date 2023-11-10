@@ -1,4 +1,4 @@
-import 'package:daily_mind/common_applications/base_audio_handler/application/base_audio_handler.dart';
+import 'package:daily_mind/common_applications/base_audio_handler/base_audio_handler.dart';
 import 'package:daily_mind/common_hooks/use_effect_delayed.dart';
 import 'package:daily_mind/common_providers/base_audio_handler_provider.dart';
 import 'package:daily_mind/common_providers/config_provider.dart';
@@ -11,24 +11,27 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class Init extends HookConsumerWidget {
-  final DailyMindAudioHandler audioHandler;
+  final DailyMindBackgroundHandler backgroundHandler;
   final WidgetsBinding engine;
 
   const Init({
     super.key,
-    required this.audioHandler,
+    required this.backgroundHandler,
     required this.engine,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.read(configProvider);
-    final baseAudioHandlerNotifier =
-        ref.read(baseAudioHandlerProvider.notifier);
+    final baseBackgroundHandlerNotifier =
+        ref.read(baseBackgroundHandlerProvider.notifier);
 
-    useEffectDelayed(() {
-      baseAudioHandlerNotifier.onSetAudioHandler(audioHandler);
-    }, [context, audioHandler]);
+    useEffectDelayed(
+      () {
+        baseBackgroundHandlerNotifier.onSetBackgroundHandler(backgroundHandler);
+      },
+      [context, backgroundHandler],
+    );
 
     return SettingWatcher(
       type: 'theme',
