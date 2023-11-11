@@ -1,4 +1,4 @@
-import 'package:daily_mind/features/focus_mode_session/constant/focus_mode_session.dart';
+import 'package:daily_mind/constants/enums.dart';
 import 'package:daily_mind/features/toggle_play_mode_button/presentation/toggle_play_mode_button.dart';
 import 'package:daily_mind/theme/theme.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +31,7 @@ class FocusModeActions extends HookWidget {
         IconButton(
           onPressed: onSettings,
           padding: EdgeInsets.all(spacing(2)),
-          icon: const Icon(Icons.settings),
+          icon: const Icon(Icons.restart_alt_rounded),
           style: IconButton.styleFrom(
             backgroundColor: context.theme.cardColor,
           ),

@@ -1,9 +1,9 @@
 import 'package:isar/isar.dart';
 
-part 'pomodoro.g.dart';
+part 'task.g.dart';
 
 @collection
-class Pomodoro {
+class Task {
   Id id = Isar.autoIncrement;
 
   int? longBreak;
@@ -13,6 +13,8 @@ class Pomodoro {
   int? workingSessions;
 
   String? audioId;
+
+  String? audioFrom;
 
   String? iconId;
 

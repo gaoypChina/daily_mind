@@ -3,14 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:get/utils.dart';
 
 class BaseChip extends StatelessWidget {
-  final String display;
-  final VoidCallback? onDeleted;
+  final Color? backgroundColor;
+  final String title;
   final VoidCallback onPressed;
+  final VoidCallback? onDeleted;
+  final Widget? avatar;
 
   const BaseChip({
     super.key,
-    required this.display,
     required this.onPressed,
+    required this.title,
+    this.avatar,
+    this.backgroundColor,
     this.onDeleted,
   });
 
@@ -22,8 +26,16 @@ class BaseChip extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: circularRadius(2),
       ),
-      backgroundColor: context.theme.primaryColorDark,
-      label: Text(display),
+      avatar: avatar,
+      backgroundColor:
+          backgroundColor ?? context.theme.primaryColorDark.withOpacity(0.3),
+      label: Text(
+        title,
+        style: TextStyle(
+          color: context.theme.primaryColor,
+        ),
+      ),
+      deleteIconColor: context.theme.primaryColor,
       onDeleted: onDeleted,
     );
   }

@@ -1,11 +1,26 @@
 part of 'base_audio_handler.dart';
 
 extension BaseTask on DailyMindBackgroundHandler {
-  void onTaskInit(Pomodoro newPomodoro) {
-    taskCurrentPomodoro = newPomodoro;
+  void onTaskInit(Task newTask) {
+    onStreamTaskCurrent.add(newTask);
     onStreamTaskCurrentStep.add(FocusModeSessionSteps.ready);
-    onStreamTaskSeconds.add(pomodoroSessionMaxSeconds);
     onStreamTaskRemainingSeconds.add(pomodoroSessionMaxSeconds);
+    onStreamTaskSeconds.add(pomodoroSessionMaxSeconds);
+
+    onInitBackgroundAudio();
+    onWatchForAudioChanged();
+  }
+
+  void onWatchForAudioChanged() {
+    db.onStreamTask(taskCurrent.id).listen((newTask) {
+      onSafeValueBuilder(
+        newTask,
+        (safeNewTask) {
+          onStreamTaskCurrent.add(safeNewTask);
+          onInitBackgroundAudio();
+        },
+      );
+    });
   }
 
   void onTaskStart() {
@@ -30,6 +45,7 @@ extension BaseTask on DailyMindBackgroundHandler {
       onCounting: (remainingSeconds) {
         onPlaySounds(remainingSeconds);
         onStreamTaskRemainingSeconds.add(remainingSeconds);
+        onTaskPlayBackgroundAudio();
       },
       onFinished: onTaskFinished,
     );
@@ -39,6 +55,51 @@ extension BaseTask on DailyMindBackgroundHandler {
     if (remainingSeconds <= 2) {
       soundEffectAudioPlayer.onPlayDing();
     }
+  }
+
+  void onUpdateAudioId(dynamic audio, String audioFrom) {
+    if (audio is AudioOffline) {
+      db.onUpdateAudioId(
+        taskCurrent,
+        audio.id,
+        audioFrom,
+      );
+    }
+  }
+
+  void onDeleteAudioId() {
+    db.onDeleteAudioId(taskCurrent);
+  }
+
+  void onInitBackgroundAudio() {
+    final audioId = taskCurrent.audioId;
+
+    onSafeValueBuilder(
+      audioId,
+      (safeAudioId) {
+        taskBackgroundAudioGaplessAudioPlayer = GaplessAudioPlayer();
+        taskBackgroundAudioGaplessAudioPlayer.onSetSource(safeAudioId);
+        taskBackgroundAudioGaplessAudioPlayer.setVolume(backgroundVolume);
+      },
+      () {
+        onTaskDisposeBackgroundAudio();
+      },
+    );
+  }
+
+  void onTaskPlayBackgroundAudio() {
+    if (taskBackgroundAudioGaplessAudioPlayer.playing) return;
+    taskBackgroundAudioGaplessAudioPlayer.play();
+  }
+
+  void onTaskPauseBackgroundAudio() {
+    if (taskBackgroundAudioGaplessAudioPlayer.playing) {
+      taskBackgroundAudioGaplessAudioPlayer.pause();
+    }
+  }
+
+  void onTaskDisposeBackgroundAudio() {
+    taskBackgroundAudioGaplessAudioPlayer.dispose();
   }
 
   void onTaskFinished() {
@@ -65,6 +126,7 @@ extension BaseTask on DailyMindBackgroundHandler {
   void onTaskPause() {
     taskCountdown.onPause();
     onTaskUpdatePlaying(false);
+    onTaskPauseBackgroundAudio();
   }
 
   void onTaskResume() {
@@ -88,6 +150,13 @@ extension BaseTask on DailyMindBackgroundHandler {
     onTaskUpdatePlaying(false);
     taskCountdown.onCancel();
     soundEffectAudioPlayer.onPlayLevelUp();
+    onTaskPauseBackgroundAudio();
+  }
+
+  void onTaskRestart() {
+    taskCurrentSession = 1;
+    taskCountdown.onCancel();
+    onTaskStart();
   }
 
   void onTaskReset() {

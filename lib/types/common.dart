@@ -30,7 +30,7 @@ typedef OnItemIndexBuilder<T> = Widget Function(
 );
 
 typedef OnSoundOfflineStateBuilder = Function(
-  GaplessAudioPlayer audioPlayer,
+  GaplessAudioPlayer gaplessAudioPlayer,
   bool isLoading,
   bool isPlaying,
 );
@@ -40,3 +40,5 @@ typedef OnOnlineHandlerBuilder = Widget Function(VoidCallback onTap);
 typedef AudioCategoryGroup = Map<String, List<AudioCategory>>;
 
 typedef OnCounting = Function(int remainingSeconds);
+
+typedef OnAudioSelected = Function(dynamic audio, String audioFrom);
