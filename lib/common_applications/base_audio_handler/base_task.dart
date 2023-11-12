@@ -21,6 +21,14 @@ extension BaseTask on DailyMindBackgroundHandler {
     });
   }
 
+  void onTaskStartOrResume() {
+    if (taskCurrentStep == FocusModeSessionSteps.ready) {
+      onTaskStart();
+    } else {
+      onTaskResume();
+    }
+  }
+
   void onTaskStart() {
     onOnlineDispose();
     onOfflineDispose();
@@ -70,19 +78,11 @@ extension BaseTask on DailyMindBackgroundHandler {
   }
 
   void onInitBackgroundAudio() {
-    final audioId = taskCurrent.audioId;
+    final audioId = taskCurrent.audioId ?? defaultAudioId;
 
-    onSafeValueBuilder(
-      audioId,
-      (safeAudioId) {
-        taskBackgroundAudioGaplessAudioPlayer = GaplessAudioPlayer();
-        taskBackgroundAudioGaplessAudioPlayer.onSetSource(safeAudioId);
-        taskBackgroundAudioGaplessAudioPlayer.setVolume(backgroundVolume);
-      },
-      () {
-        onTaskDisposeBackgroundAudio();
-      },
-    );
+    taskBackgroundAudioGaplessAudioPlayer = GaplessAudioPlayer();
+    taskBackgroundAudioGaplessAudioPlayer.onSetSource(audioId);
+    taskBackgroundAudioGaplessAudioPlayer.setVolume(backgroundVolume);
   }
 
   void onTaskPlayBackgroundAudio() {
