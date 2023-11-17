@@ -3,6 +3,7 @@ import 'package:daily_mind/constants/constants.dart';
 import 'package:daily_mind/features/typography/presentation/list_header.dart';
 import 'package:daily_mind/types/common.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/utils.dart' hide Trans;
 
 class BaseGridItemsHeader<T> extends StatelessWidget {
@@ -39,19 +40,20 @@ class BaseGridItemsHeader<T> extends StatelessWidget {
                 ),
               ),
             ),
-          Flexible(
-            child: BaseGridItems(
-              items: items,
-              onItemIndexBuilder: (context, index, item) {
-                final index = items.indexOf(item);
-
-                return onItemIndexBuilder(
+          BaseGridItems(
+            items: items,
+            crossAxisCount: 4,
+            onItemIndexBuilder: (context, index, item) {
+              return StaggeredGridTile.count(
+                crossAxisCellCount: 2,
+                mainAxisCellCount: 1.25,
+                child: onItemIndexBuilder(
                   context,
                   index,
                   item,
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ],
       ),

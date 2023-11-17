@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 const background = Color(0xFF07020D);
 const celadon = Color(0xFFB0F2B4);
 const maize = Color(0xFFFFF07C);
+const red = Color(0xFFE83151);
 const secondaryTextColor = Colors.white70;
 
 final fontFamily = GoogleFonts.inter().fontFamily;
@@ -17,20 +18,14 @@ ThemeData createDarkTheme(SupportedTheme theme) {
     background: background,
     scaffoldBackground: background,
     useMaterial3: true,
-    swapLegacyOnMaterial3: true,
-    useMaterial3ErrorColors: true,
     surfaceMode: FlexSurfaceMode.levelSurfacesLowScaffold,
-    blendLevel: 13,
+    error: red,
     subThemesData: FlexSubThemesData(
       alignedDropdown: true,
-      blendOnLevel: 20,
       inputDecoratorFocusedHasBorder: false,
       inputDecoratorUnfocusedHasBorder: false,
       inputDecoratorUnfocusedBorderIsColored: false,
-      inputDecoratorFillColor: background,
       inputDecoratorRadius: spacing(2),
-      useM2StyleDividerInM3: true,
-      useTextTheme: true,
     ),
   );
 }

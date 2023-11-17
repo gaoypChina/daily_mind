@@ -1,4 +1,5 @@
 import 'package:daily_mind/common_widgets/base_animated_opacity.dart';
+import 'package:daily_mind/common_widgets/base_backdrop_filter.dart';
 import 'package:daily_mind/theme/common.dart';
 import 'package:flutter/material.dart';
 
@@ -16,18 +17,21 @@ class Background extends StatelessWidget {
       children: [
         BaseAnimatedOpacity(
           valueKey: ValueKey(image),
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: image,
-                fit: BoxFit.cover,
+          child: Opacity(
+            opacity: 0.6,
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: image,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
         ),
-        Container(
-          decoration: const BoxDecoration(
-            gradient: baseLinearGradient,
+        BaseBackdropFilter(
+          child: Container(
+            decoration: const BoxDecoration(gradient: baseLinearGradient),
           ),
         )
       ],
