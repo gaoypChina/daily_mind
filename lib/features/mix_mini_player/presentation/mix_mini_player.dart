@@ -1,4 +1,5 @@
 import 'package:daily_mind/common_applications/base_bottom_sheet.dart';
+import 'package:daily_mind/common_providers/base_audio_handler_provider.dart';
 import 'package:daily_mind/common_widgets/base_mini_player/presentation/base_mini_player.dart';
 import 'package:daily_mind/features/mix/presentation/mix_provider.dart';
 import 'package:daily_mind/features/mix_mini_player/presentation/mix_mini_player_images.dart';
@@ -13,8 +14,14 @@ class MixMiniPlayer extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final mixState = ref.watch(mixProvider);
-    final mixItems = mixState.mixItems;
+    final mixNotifier = ref.read(mixProvider.notifier);
+    final baseBackgroundHandler = ref.watch(baseBackgroundHandlerProvider);
+    final playBackState = useStream(baseBackgroundHandler.playbackState);
+    final isPlaying = playBackState.data?.playing ?? false;
+    final mixItemsSnapshot = useStream(baseBackgroundHandler.onStreamMixItems);
+    final mixItems = mixItemsSnapshot.data ?? [];
+    final mediaItemSnapshot = useStream(baseBackgroundHandler.mediaItem);
+    final mediaItem = mediaItemSnapshot.data;
 
     final title = mixItems.map((item) {
       final audio = item.audio;
@@ -23,24 +30,26 @@ class MixMiniPlayer extends HookConsumerWidget {
     }).join(', ');
 
     final onOpenMiniPlayer = useCallback(
-      () {
-        onShowBottomSheet(
+      () async {
+        await onShowBottomSheet(
           context,
           child: const MixPlayer(),
         );
+
+        mixNotifier.onClearTitle();
       },
       [context],
     );
 
     return BaseMiniPlayer(
       onTap: onOpenMiniPlayer,
-      title: title,
+      title: mediaItem?.title ?? title,
       subtitle: '${mixItems.length} âm thanh'.tr(),
       leading: const MixMiniPlayerImages(),
       isLoading: false,
-      isPlaying: false,
-      onPause: () {},
-      onPlay: () {},
+      isPlaying: isPlaying,
+      onPause: baseBackgroundHandler.pause,
+      onPlay: baseBackgroundHandler.play,
     );
   }
 }

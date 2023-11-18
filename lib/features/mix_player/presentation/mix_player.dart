@@ -1,10 +1,11 @@
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:daily_mind/common_applications/base_snackbar.dart';
 import 'package:daily_mind/common_widgets/base_content_header.dart';
 import 'package:daily_mind/common_widgets/base_scaffold.dart';
 import 'package:daily_mind/common_widgets/base_text_field.dart';
 import 'package:daily_mind/features/mix_collection_button_switcher/presentation/mix_collection_button_switcher.dart';
-import 'package:daily_mind/features/mix_player_item/presentation/mix_player_item.dart';
 import 'package:daily_mind/features/mix/presentation/mix_provider.dart';
+import 'package:daily_mind/features/mix_player_list_item/presentation/mix_player_list_item.dart';
 import 'package:daily_mind/theme/common.dart';
 import 'package:daily_mind/theme/theme.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -18,8 +19,9 @@ class MixPlayer extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final mixState = ref.watch(mixProvider);
-    final mixNotifier = ref.read(mixProvider.notifier);
-    final mixItems = mixState.mixItems;
+    final mixNotifier = ref.watch(mixProvider.notifier);
+
+    final mixItems = mixNotifier.mixItems;
 
     final onSaveMix = useCallback(
       () async {
@@ -29,7 +31,11 @@ class MixPlayer extends HookConsumerWidget {
             message: 'Vui lòng nhập tên'.tr(),
           );
         } else {
-          mixNotifier.onAddNewMix();
+          await mixNotifier.onAddNewMix();
+
+          if (context.mounted) {
+            onShowSnackbar(context, content: 'Đã lưu vào bộ sưu tập'.tr());
+          }
         }
       },
       [mixState],
@@ -38,7 +44,7 @@ class MixPlayer extends HookConsumerWidget {
     return BaseScaffold(
       footerButtons: [
         MixCollectionButtonSwitcher(
-          isCanAddNewMix: mixState.isCanAddANewMix,
+          isCanAddNewMix: mixNotifier.isCanAddANewMix,
           onDeleteMix: mixNotifier.onDeleteMix,
           onSaveMix: onSaveMix,
         ),
@@ -49,16 +55,6 @@ class MixPlayer extends HookConsumerWidget {
           children: space(
             [
               BaseContentHeader(
-                title: 'Danh sách âm thanh'.tr(),
-                spacingSize: 5,
-                child: Column(
-                  children: space(
-                    mixItems.map((item) => MixPlayerItem(item: item)).toList(),
-                    height: spacing(6),
-                  ),
-                ),
-              ),
-              BaseContentHeader(
                 title: 'name'.tr(),
                 child: BaseTextField(
                   hintText: 'nameOfTheMix'.tr(),
@@ -66,8 +62,17 @@ class MixPlayer extends HookConsumerWidget {
                   onChanged: mixNotifier.onUpdateTitle,
                 ),
               ),
+              Flexible(
+                child: BaseContentHeader(
+                  title: 'Danh sách âm thanh'.tr(),
+                  spacingSize: 4,
+                  child: Flexible(
+                    child: MixPlayerListItem(mixItems: mixItems),
+                  ),
+                ),
+              )
             ],
-            height: spacing(10),
+            height: spacing(4),
           ),
         ),
       ),
