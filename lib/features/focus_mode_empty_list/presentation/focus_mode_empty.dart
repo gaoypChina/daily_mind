@@ -10,6 +10,7 @@ class FocusModeEmptyList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BaseSpacingContainerHorizontal(
+      alignment: Alignment.bottomCenter,
       child: BaseEmptyListBox(
         action: const FocusModeNewSessionButton(),
         imageUrl: 'assets/images/sessions_working.png',
