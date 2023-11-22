@@ -13,21 +13,22 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   final engine = WidgetsFlutterBinding.ensureInitialized();
-  await db.onInit();
+
   await EasyLocalization.ensureInitialized();
-  await localNotifications.onInit();
 
-  await Supabase.initialize(
-    url: Env.supaBaseProjectUrl,
-    anonKey: Env.supaBaseAnonKey,
-  );
-
+  await db.onInit();
   final backgroundHandler = await AudioService.init(
     builder: () => DailyMindBackgroundHandler(),
     config: const AudioServiceConfig(
       androidNotificationChannelId: 'dev.andyng.dailymind.channel.background',
       androidNotificationChannelName: 'Music Playback',
     ),
+  );
+  await localNotifications.onInit();
+
+  await Supabase.initialize(
+    url: Env.supaBaseProjectUrl,
+    anonKey: Env.supaBaseAnonKey,
   );
 
   runApp(

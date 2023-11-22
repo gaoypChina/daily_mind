@@ -1,5 +1,4 @@
 import 'package:daily_mind/common_applications/safe_builder.dart';
-import 'package:daily_mind/constants/constants.dart';
 import 'package:daily_mind/db/migration/v1.dart';
 import 'package:daily_mind/db/schemas/first_time.dart';
 import 'package:daily_mind/db/schemas/playlist.dart';
@@ -34,6 +33,8 @@ class Db {
 
     final currentVersion = prefs.getInt('dbVersion') ?? 1;
 
+    onClearBrokenData();
+
     switch (currentVersion) {
       case 1:
         migrationV1(isar);
@@ -45,6 +46,15 @@ class Db {
     }
 
     await prefs.setInt('dbVersion', 2);
+  }
+
+  void onClearBrokenData() {
+    final playlists = isar.playlists.filter().itemsIsNull().findAllSync();
+
+    isar.writeTxnSync(() {
+      isar.playlists
+          .deleteAllSync(playlists.map((playlist) => playlist.id).toList());
+    });
   }
 
   Stream<List<Playlist>> onStreamAllPlaylists() {
@@ -178,24 +188,6 @@ class Db {
   void onDeleteTask(int id) {
     isar.writeTxnSync(() {
       isar.tasks.deleteSync(id);
-    });
-  }
-
-  void onUpdateAudioId(Task task, String audioId, String audioFrom) {
-    task.audioId = audioId;
-    task.audioFrom = audioFrom;
-
-    isar.writeTxnSync(() {
-      isar.tasks.putSync(task);
-    });
-  }
-
-  void onDeleteAudioId(Task task) {
-    task.audioId = emptyNull;
-    task.audioFrom = emptyNull;
-
-    isar.writeTxnSync(() {
-      isar.tasks.putSync(task);
     });
   }
 

@@ -4,6 +4,7 @@ import 'package:daily_mind/common_hooks/use_effect_delayed.dart';
 import 'package:daily_mind/common_providers/base_audio_handler_provider.dart';
 import 'package:daily_mind/constants/enums.dart';
 import 'package:daily_mind/features/focus_mode_actions/presentation/focus_mode_actions.dart';
+import 'package:daily_mind/features/focus_mode_audio/presentation/focus_mode_audio.dart';
 import 'package:daily_mind/features/focus_mode_session_current_step_text/presentation/focus_mode_session_current_step_text.dart';
 import 'package:daily_mind/features/focus_mode_session/hook/useBackgroundTaskData.dart';
 import 'package:daily_mind/features/focus_mode_task_selector/presentation/focus_mode_task_selector.dart';
@@ -62,19 +63,15 @@ class FocusModeSession extends HookConsumerWidget {
 
     final onFinish = useCallback(
       () async {
-        final result = await showOkCancelAlertDialog(
+        final result = await showOkAlertDialog(
           context: context,
-          title: 'Hòa thành'.tr(),
-          message: 'Bạn có muốn tiếp tục?'.tr(),
-          cancelLabel: 'Thoát'.tr(),
-          okLabel: 'Tiếp tục'.tr(),
+          title: 'Tuyệt vời, bạn đã hoàn thành'.tr(),
+          okLabel: 'Ok'.tr(),
         );
 
         if (context.mounted) {
           if (result == OkCancelResult.ok) {
             baseBackgroundHandler.onTaskReset();
-          } else {
-            context.pop();
           }
         }
       },
@@ -94,12 +91,6 @@ class FocusModeSession extends HookConsumerWidget {
         onFinish();
       }
     }, [taskBackgroundData.taskCurrentStep]);
-
-    useEffect(() {
-      return () {
-        baseBackgroundHandler.onTaskDisposeBackgroundAudio();
-      };
-    }, []);
 
     return Container(
       alignment: Alignment.center,
@@ -123,12 +114,13 @@ class FocusModeSession extends HookConsumerWidget {
               ),
             ),
             FocusModeTimer(
-              isPlaying: taskBackgroundData.taskIsPlaying,
+              isRunning: taskBackgroundData.taskIsRunning,
               remainingSeconds: taskBackgroundData.taskRemainingSeconds,
               seconds: taskBackgroundData.taskSeconds,
             ),
+            const FocusModeAudio(),
             FocusModeActions(
-              isPlaying: taskBackgroundData.taskIsPlaying,
+              isRunning: taskBackgroundData.taskIsRunning,
               onClose: onClose,
               onPause: baseBackgroundHandler.onTaskPause,
               onPlay: baseBackgroundHandler.onTaskStartOrResume,
